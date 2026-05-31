@@ -2,7 +2,7 @@
 
 # Usuarios de prueba
 usuario cliente =>  email: cliente@tienda.com    contraseña: 123456
-usuario cliente =>  email: admin@tienda.com    contraseña: 123456
+usuario administrador =>  email: admin@tienda.com    contraseña: 123456
 
 
 ## ¿Qué es este proyecto?
