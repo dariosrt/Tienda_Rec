@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Plus, Search, Pencil, Trash2, Package, AlertTriangle, Euro } from "lucide-react";
+import { Plus, Search, Pencil, Trash2, Package, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card";
 import { Input } from "../components/ui/input";
 import { Button } from "../components/ui/button";
@@ -52,7 +52,6 @@ export default function ItemsManagementContent() {
   // KPIs Calculados dinámicamente
   const totalItems = productos.length;
   const stockBajo = productos.filter((p) => p.stock <= 5).length;
-  const valorInventario = productos.reduce((acc, p) => acc + (p.precio * p.stock), 0);
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">

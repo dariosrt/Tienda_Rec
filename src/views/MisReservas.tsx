@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { supabase } from "../utils/supabase";
-import { CreditCard, Save, Trash2 } from "lucide-react";
+import { CreditCard, Trash2 } from "lucide-react";
 
 interface OrderLine {
   id_linea: number;
@@ -162,13 +162,7 @@ const handleQtyChange = (idPedido: number, idLinea: number, nuevaCant: number) =
     } : o));
   };
 
-  // NUEVO: Guardar cambios en DB
-  const saveOrderChanges = async (order: UserOrder) => {
-    for (const linea of order.lineas) {
-      await supabase.from("linea_pedido").update({ cantidad: linea.cantidad }).eq("id_linea", linea.id_linea);
-    }
-    alert("Cambios guardados");
-  };
+
 
   return (
     <div className="min-h-screen flex flex-col bg-background font-sans text-foreground">
