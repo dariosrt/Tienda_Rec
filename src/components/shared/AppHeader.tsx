@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { Menu, ShoppingCart, User } from "lucide-react"
-import { Avatar, AvatarImage, AvatarFallback } from "../ui/avatar"
+import { Avatar, AvatarFallback } from "../ui/avatar"
 import { Button } from "../ui/button"
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger, SheetDescription } from "../ui/sheet"
 import { supabase } from "../../utils/supabase"
