@@ -1,22 +1,31 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './views/Login.tsx'
-import Register from './views/Register.tsx'
-import GestionProductos from './views/GestionProductos.tsx'
-import {Easter} from './views/Easter.tsx'
-import Tienda from './views/Tienda.tsx'
-import Carrito from './views/Carrito.tsx'
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 
-export const App = ({user}) => {
-  return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/easter" element={<Easter />} />
+import LoginPage from './views/Login.tsx';
+import Register from './views/Register.tsx';
+import GestionProductos from './views/GestionProductos.tsx';
+import GestionUsuarios from './views/GestionUsuarios.tsx';
+import Tienda from './views/Tienda.tsx';
+import Carrito from './views/Carrito.tsx';
+import Profile from './views/Profile.tsx';
+import MisReservas from './views/MisReservas.tsx';
+
+export const App = () => (
+  <BrowserRouter>
+    <Routes>
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/gestion-productos" element={<GestionProductos />} />
+
+
         <Route path="/" element={<Tienda />} />
+        <Route path="/tienda" element={<Tienda />} />
+        <Route path="/perfil" element={<Profile />} />
+        <Route path="/mis-reservas" element={<MisReservas />} />
         <Route path="/carrito" element={<Carrito />} />
-      </Routes>
-    </BrowserRouter>
-  )
-}
+
+        <Route path="/admin/gestion-usuarios" element={<GestionUsuarios />} />
+        <Route path="/admin/gestion-productos" element={<GestionProductos />} />
+
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  </BrowserRouter>
+);

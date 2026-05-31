@@ -55,31 +55,42 @@ export default function Carrito() {
         }
     };
 
-    const handlePay = async () => {
-        const orderTotal = subtotal + envio;
-        if (orderTotal <= 0) return;
+const handlePay = async () => {
+    // 1. Obtener el usuario autenticado real
+// 1. Obtener el usuario autenticado real
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+        alert("Debes iniciar sesión para realizar el pedido.");
+        return;
+    }
 
-        const userId = await getLoggedUserId();
-        if (!userId) {
-            console.error("No se encontró usuario autenticado.");
-            return;
-        }
+    // 2. Insertar pedido usando user.id directamente
+    const { data: nuevoPedido, error: pedidoError } = await supabase
+        .from("pedido")
+        .insert([{ id_usuario: user.id, total: subtotal + envio, estado: "pagado", fecha: new Date().toISOString() }])
+        .select("id_pedido")
+        .single();
 
-        const { error } = await supabase.from("pedido").insert([{
-            id_usuario: userId,
-            total: orderTotal,
-            estado: "pagado",
-            fecha: new Date().toISOString(),
-        }]);
-
-        if (error) {
-            console.error("Error al crear el pedido:", error);
-            return;
-        }
-
+    if (nuevoPedido) {
+        const lineas = cart.map(item => ({
+            id_pedido: nuevoPedido.id_pedido,
+            id_producto: item.id_producto,
+            cantidad: item.cantidad,
+            precio_unidad: item.precio
+        }));
+        await supabase.from("linea_pedido").insert(lineas);
         saveCart([]);
         setCart([]);
+        alert("¡Pedido realizado con éxito!");
     }
+
+    if (pedidoError) {
+        console.error("Error al insertar pedido:", pedidoError);
+        alert("Error al tramitar el pedido. Asegúrate de tener perfil registrado.");
+        return;
+    }
+}
 
     if (cart.length === 0) {
         return (

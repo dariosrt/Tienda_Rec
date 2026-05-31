@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Cambia a 'next/navigation' si usas Next.js
+import { Link, useNavigate } from "react-router-dom"; // Cambia a 'next/navigation' si usas Next.js
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -140,9 +140,11 @@ export function LoginForm() {
         <CardFooter className="px-0 pt-4 sm:px-6">
           <p className="w-full text-center text-sm text-muted-foreground">
             ¿No tienes una cuenta?{' '}
-            <a href="#" className="font-medium text-indigo-600 hover:underline">
-              Crea una cuenta
-            </a>
+            <Link to="/register">
+              <span className="font-medium text-indigo-600 hover:underline">
+                Crea una cuenta
+              </span>
+            </Link>
           </p>
         </CardFooter>
       </Card>

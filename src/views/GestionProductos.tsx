@@ -103,18 +103,6 @@ export default function ItemsManagementContent() {
           </CardContent>
         </Card>
 
-        <Card className="bg-card border-border shadow-xs sm:col-span-2 lg:col-span-1">
-          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-            <CardTitle className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Valor Estimado</CardTitle>
-            <Euro className="size-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">
-              {valorInventario.toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
-            </div>
-            <p className="text-xs text-muted-foreground">Capital total inmovilizado</p>
-          </CardContent>
-        </Card>
       </div>
 
       {/* Sección del buscador */}

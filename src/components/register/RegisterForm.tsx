@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom"; 
+import { Link, useNavigate } from "react-router-dom"; 
 import { Button } from "../ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Input } from "../ui/input";
@@ -13,29 +13,41 @@ export function RegisterForm() {
   const [errorMsg, setErrorMsg] = useState("");
   
   const navigate = useNavigate();
-
 async function handleSubmit(e: React.FormEvent) {
   e.preventDefault();
-  setLoading(true); setErrorMsg("");
+  setLoading(true);
+  setErrorMsg("");
 
   try {
-    // 1. SOLO registramos en Auth pasando el nombre en los metadatos (options)
-    const { error: authError } = await supabase.auth.signUp({
+    // 1. Crear el usuario en Auth
+    const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
-      options: {
-        data: { nombre: nombre } // El Trigger de la DB leerá este nombre automáticamente
-      }
+      options: { data: { nombre: nombre } }
     });
 
     if (authError) throw authError;
 
-    // 2. Si todo va bien, redirigimos directamente. El Trigger se encarga de la tabla pública en segundo plano.
-    navigate("/tienda"); 
+    // 2. Crear el perfil en la tabla public.usuario manualmente
+    if (authData.user) {
+      const { error: dbError } = await supabase
+        .from("usuario")
+        .insert([
+          { 
+            id_usuario: authData.user.id, 
+            nombre: nombre, 
+            email: email, 
+            rol: 'cliente' 
+          }
+        ]);
 
+      if (dbError) throw dbError;
+    }
+
+    navigate("/tienda");
   } catch (error: any) {
-    console.error("Error capturado:", error);
-    setErrorMsg(error.message || "Error al crear la cuenta.");
+    console.error("Error detallado:", error);
+    setErrorMsg(error.message);
   } finally {
     setLoading(false);
   }
@@ -77,7 +89,11 @@ async function handleSubmit(e: React.FormEvent) {
         <CardFooter className="px-0 pt-4 sm:px-6">
           <p className="w-full text-center text-sm text-muted-foreground">
             ¿Ya tienes una cuenta?{' '}
-            <a href="/login" className="font-medium text-indigo-600 hover:underline">Inicia sesión</a>
+            <Link to="/login">
+              <span className="font-medium text-indigo-600 hover:underline">
+                Iniciar sesión
+              </span>
+            </Link>
           </p>
         </CardFooter>
       </Card>

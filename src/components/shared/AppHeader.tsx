@@ -9,7 +9,10 @@ import { supabase } from "../../utils/supabase" // Ajusta esta ruta según tu es
 import { Link } from "react-router-dom"
 
 const navLinks = [
-  { href: "/", label: "Tienda" },
+  // { href: "/", label: "Tienda" },
+  { href: "/carrito", label: "Carrito" },
+  { href: "/mis-reservas", label: "Mis Reservas" },
+
 ]
 
 export function AppHeader() {
@@ -79,25 +82,28 @@ export function AppHeader() {
             <Link to="/carrito" className="text-muted-foreground hidden sm:inline-flex cursor-pointer">
               <ShoppingCart className="size-5" />
             </Link>
+            <Link to="/perfil">
+              <Avatar className="cursor-pointer hover:opacity-80 transition-opacity border border-border">
+                {/* Intentamos cargar la imagen de los metadatos de Supabase Auth */}
+                {user.user_metadata?.avatar_url ? (
+                  <AvatarImage 
+                    src={user.user_metadata.imagen_url} 
+                    alt={user.user_metadata?.nombre || "Avatar de usuario"} 
+                  />
+                ) : null}
+                
+                {/* Si la imagen falla o no tiene, ponemos las iniciales de su nombre o el icono por defecto */}
 
-            <Avatar className="cursor-pointer hover:opacity-80 transition-opacity border border-border">
-              {/* Intentamos cargar la imagen de los metadatos de Supabase Auth */}
-              {user.user_metadata?.avatar_url ? (
-                <AvatarImage 
-                  src={user.user_metadata.imagen_url} 
-                  alt={user.user_metadata?.nombre || "Avatar de usuario"} 
-                />
-              ) : null}
-              
-              {/* Si la imagen falla o no tiene, ponemos las iniciales de su nombre o el icono por defecto */}
-              <AvatarFallback className="bg-primary text-primary-foreground font-semibold uppercase text-xs">
-                {user.user_metadata?.nombre ? (
-                  user.user_metadata.nombre.slice(0, 2)
-                ) : (
-                  <User className="size-4" />
-                )}
-              </AvatarFallback>
-            </Avatar>
+                <AvatarFallback className="bg-primary text-primary-foreground font-semibold uppercase text-xs">
+                  {user.user_metadata?.nombre ? (
+                    user.user_metadata.nombre.slice(0, 2)
+                  ) : (
+                    <User className="size-4" />
+                  )}
+                </AvatarFallback>
+              </Avatar>
+            </Link>
+
           </>
         ) : (
           // SI EL USUARIO NO ESTÁ LOGUEADO: Muestra el botón de inicio de sesión
@@ -109,3 +115,6 @@ export function AppHeader() {
     </header>
   )
 }
+
+
+

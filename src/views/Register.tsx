@@ -7,7 +7,6 @@ export default function RegisterPage() {
       <AppHeader />
 
       <main className="flex flex-1 overflow-hidden">
-        {/* Reutilizamos el Hero del Login para mantener consistencia visual sin escribir CSS extra */}
         <LoginHero /> 
         <RegisterForm />
       </main>
