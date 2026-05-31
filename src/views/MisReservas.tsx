@@ -10,7 +10,7 @@ import {
   CardTitle,
 } from "../components/ui/card";
 import { supabase } from "../utils/supabase";
-import { Trash2 } from "lucide-react";
+import { CreditCard, Save, Trash2 } from "lucide-react";
 
 interface OrderLine {
   id_linea: number;
@@ -56,7 +56,6 @@ useEffect(() => {
 
   checkAuthAndLoadOrders();
 }, [navigate]);
-
   const loadOrders = async (currentUserId: string) => {
     setLoading(true);
     const { data: pedidos, error: pedidosError } = await supabase
@@ -107,7 +106,15 @@ useEffect(() => {
 
   // --- DELETE: Función para eliminar una reserva ---
   const handleCancelOrder = async (idPedido: number) => {
+    const order = orders.find(o => o.id_pedido === idPedido);
+    
+    if (order?.estado === 'pagado') {
+      alert("No puedes cancelar una reserva que ya ha sido pagada.");
+      return;
+    }
+
     const confirmed = window.confirm("¿Seguro que deseas cancelar y eliminar esta reserva?");
+    
     if (!confirmed) return;
 
     // 1. Primero borramos las líneas de pedido vinculadas (por restricción de Foreign Key)
@@ -134,6 +141,33 @@ useEffect(() => {
 
     // 3. Actualizamos el estado local (UI) para que desaparezca al instante
     setOrders((prevOrders) => prevOrders.filter((o) => o.id_pedido !== idPedido));
+  };
+
+const handleSimulatePayment = async (idPedido: number) => {
+    const { error } = await supabase
+      .from("pedido")
+      .update({ estado: "pagado" })
+      .eq("id_pedido", idPedido);
+
+    if (error) {
+      alert("Error al procesar el pago");
+    } else {
+      loadOrders(userId); // Recargar datos
+    }
+  };
+const handleQtyChange = (idPedido: number, idLinea: number, nuevaCant: number) => {
+    setOrders(prev => prev.map(o => o.id_pedido === idPedido ? {
+        ...o,
+        lineas: o.lineas.map(l => l.id_linea === idLinea ? { ...l, cantidad: Math.max(1, nuevaCant) } : l)
+    } : o));
+  };
+
+  // NUEVO: Guardar cambios en DB
+  const saveOrderChanges = async (order: UserOrder) => {
+    for (const linea of order.lineas) {
+      await supabase.from("linea_pedido").update({ cantidad: linea.cantidad }).eq("id_linea", linea.id_linea);
+    }
+    alert("Cambios guardados");
   };
 
   return (
@@ -184,6 +218,8 @@ useEffect(() => {
                             {order.total.toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
                           </span>
                           
+
+                        </div>
                           {/* Botón de Eliminar / Cancelar */}
                           <Button 
                             variant="destructive" 
@@ -193,19 +229,55 @@ useEffect(() => {
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
-                        </div>
                       </div>
 
                       {order.lineas.length > 0 ? (
                         <div className="mt-5 space-y-3 border-t border-border pt-4">
-                          {order.lineas.map((linea) => (
-                            <div key={linea.id_linea} className="flex justify-between items-center text-sm">
-                              <span className="text-muted-foreground">Producto ID: {linea.id_producto}</span>
-                              <span className="font-medium">
-                                {linea.cantidad} x {linea.precio_unidad.toLocaleString("es-ES", { style: "currency", currency: "EUR" })}
-                              </span>
-                            </div>
-                          ))}
+                          {orders.map((order) => (
+                              <div key={order.id_pedido} className="rounded-2xl border p-5 shadow-sm">
+                                <div className="flex justify-between items-center mb-4">
+                                  <div>Reserva #{order.id_pedido} - <span className="uppercase font-bold text-xs">{order.estado}</span></div>
+                                  
+                                  {/* BOTONES ACCIÓN */}
+                                  <div className="flex gap-2">
+                                      {order.estado === "pendiente" && (
+                                          <Button size="sm" variant="outline" onClick={() => handleSimulatePayment(order.id_pedido)}>
+                                              <CreditCard className="mr-2 h-4 w-4"/> Pagar
+                                          </Button>
+                                      )}
+                                      <Button variant="destructive" size="icon" onClick={() => handleCancelOrder(order.id_pedido)}><Trash2 className="h-4 w-4" /></Button>
+                                  </div>
+                                </div>
+
+                                {order.lineas.map((linea) => (
+                                  <div key={linea.id_linea} className="flex justify-between items-center mb-2">
+                                    <span>Producto {linea.id_producto}</span>
+                                    {order.estado === "pendiente" ? (
+                                      <input 
+                                          type="number" 
+                                          value={linea.cantidad} 
+                                          onChange={(e) => handleQtyChange(order.id_pedido, linea.id_linea, parseInt(e.target.value))}
+                                          className="w-16 border rounded text-center"
+                                      />
+                                    ) : (
+                                      <span>{linea.cantidad}</span>
+                                    )}
+                                  </div>
+                                ))}
+                                
+                              {/* Solo mostrar si NO está pagado */}
+                                {order.estado !== 'pagado' && (
+                                  <Button 
+                                    variant="destructive" 
+                                    size="icon" 
+                                    title="Cancelar reserva"
+                                    onClick={() => handleCancelOrder(order.id_pedido)}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                )}
+                              </div>
+                            ))}
                         </div>
                       ) : (
                         <p className="mt-4 text-sm text-muted-foreground">Esta reserva no tiene detalles asociados.</p>

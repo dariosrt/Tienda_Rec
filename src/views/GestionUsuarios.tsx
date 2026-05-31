@@ -83,7 +83,7 @@ async function handleDelete(u: Usuario) {
     <div className="min-h-screen flex flex-col bg-background text-foreground font-sans">
       <AppHeader />
 
-      <main className="flex-1 w-full space-y-6 p-6 sm:p-8">
+      <main className="flex-1 w-full space-y-6 p-2 sm:p-8">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold tracking-tight">Gestión de Usuarios</h1>
