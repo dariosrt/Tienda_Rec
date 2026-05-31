@@ -105,9 +105,6 @@ export function LoginForm() {
                 >
                   Contraseña
                 </label>
-                <a href="#" className="text-sm font-medium text-indigo-600 hover:underline">
-                  ¿Olvidaste tu contraseña?
-                </a>
               </div>
               <Input 
                 id="password"
